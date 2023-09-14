@@ -27,24 +27,24 @@ public class AuthControllerITTest {
 
     private SignupRequest createSignUpRequest() {
         final SignupRequest signupRequest = new SignupRequest();
-        signupRequest.setEmail("john@doe.fr");
+        signupRequest.setEmail("john@doe.com");
         signupRequest.setFirstName("John");
         signupRequest.setLastName("Doe");
-        signupRequest.setPassword("johndoe123");
+        signupRequest.setPassword("johndoe123!");
 
         return signupRequest;
     }
     @Test
     public void testAuthenticateSuccess() throws Exception {
         final LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setEmail("user@test.com");
+        loginRequest.setEmail("yoga@studio.com");
         loginRequest.setPassword("test!1234");
 
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.admin", is(false)))
+                .andExpect(jsonPath("$.admin", is(true)))
                 .andReturn();
     }
 
