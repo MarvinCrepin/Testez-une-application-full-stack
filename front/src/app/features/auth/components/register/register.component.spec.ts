@@ -65,7 +65,7 @@ describe('RegisterComponent', () => {
     component.form = mockFormBuilder.group(registerFields);
   });
 
-  it('should create', () => {
+  it('should create the component', () => {
     expect(component).toBeTruthy();
   });
 

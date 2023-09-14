@@ -22,7 +22,7 @@ describe('LoginComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [LoginComponent],
-      providers: [SessionService], // Utilisez ici le bon service de session
+      providers: [SessionService],
       imports: [
         RouterTestingModule,
         BrowserAnimationsModule,
