@@ -6,21 +6,17 @@
 
 Clone the project
 
-> [git clone] (https://github.com/MarvinCrepin/Testez-une-application-full-stack/)
+> git clone https://github.com/MarvinCrepin/Testez-une-application-full-stack/
 
 ## Install API
 
 > cd back
 
-# Install dependencies:
-
 > mvn clean install
-
-# Run the server :
 
 > mvn spring-boot:run
 
-# Access to the API at http://localhost:8080.
+Access to the API at http://localhost:8080.
 
 # Generate the jacoco code coverage:
 
@@ -30,11 +26,11 @@ mvn clean test
 
 > cd front
 
-# Install dependencies:
+Install dependencies:
 
 > npm install
 
-Launch Front-end:
+Run front-end server :
 
 > npm run start;
 
