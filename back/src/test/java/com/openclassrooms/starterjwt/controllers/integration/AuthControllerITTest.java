@@ -27,7 +27,7 @@ public class AuthControllerITTest {
 
     private SignupRequest createSignUpRequest() {
         final SignupRequest signupRequest = new SignupRequest();
-        signupRequest.setEmail("john@doe.com");
+        signupRequest.setEmail("john@doe.ol");
         signupRequest.setFirstName("John");
         signupRequest.setLastName("Doe");
         signupRequest.setPassword("johndoe123!");
