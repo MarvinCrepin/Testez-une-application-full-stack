@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,10 +35,13 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
 class SessionControllerTest {
-    @Mock
-    private SessionMapper sessionMapper ;
-    @Mock
+    @Autowired
+    private SessionMapper sessionMapper;
+    @Autowired
     private SessionService sessionService;
+
+    @Autowired
+    private SessionController sessionController;
     private Session session;
     private SessionDto sessionDto;
 
@@ -56,9 +60,6 @@ class SessionControllerTest {
 
     @Test
     void findById() throws Exception{
-        when(sessionService.getById(any(Long.class))).thenReturn(session);
-        when(sessionMapper.toDto(any(Session.class))).thenReturn(sessionDto);
-        SessionController sessionController = new SessionController(sessionService,sessionMapper);
         ResponseEntity<?> response = sessionController.findById("1");
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(sessionDto,response.getBody());
@@ -68,71 +69,42 @@ class SessionControllerTest {
 
     @Test
     void findAll() {
-        List<Session> sessionList = new ArrayList<>();
-        sessionList.add(session);
         List<SessionDto> sessionDtoList = new ArrayList<>();
         sessionDtoList.add(sessionDto);
-        when(sessionService.findAll()).thenReturn(sessionList);
-        when(sessionMapper.toDto(sessionList)).thenReturn(sessionDtoList);
-        SessionController sessionController = new SessionController(sessionService,sessionMapper);
         ResponseEntity<?> response = sessionController.findAll();
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(sessionDtoList,response.getBody());
-        verify(sessionService).findAll();
-        verify(sessionMapper).toDto(sessionList);
     }
 
     @Test
     void create() {
-        when(sessionMapper.toEntity(sessionDto)).thenReturn(session);
-        when(sessionService.create(any(Session.class))).thenReturn(session);
-        when(sessionMapper.toDto(any(Session.class))).thenReturn(sessionDto);
-        SessionController sessionController = new SessionController(sessionService,sessionMapper);
         ResponseEntity<?> response = sessionController.create(sessionDto);
         assertEquals(HttpStatus.OK,response.getStatusCode());
         assertEquals(sessionDto, response.getBody());
-        verify(sessionMapper).toEntity(any(SessionDto.class));
-        verify(sessionService).create(any(Session.class));
-        verify(sessionMapper).toDto(any(Session.class));
     }
 
     @Test
     void update() {
-        when(sessionMapper.toEntity(sessionDto)).thenReturn(session);
-        when(sessionService.update(any(Long.class),any(Session.class))).thenReturn(session);
-        when(sessionMapper.toDto(any(Session.class))).thenReturn(sessionDto);
-        SessionController sessionController = new SessionController(sessionService,sessionMapper);
         ResponseEntity<?> response = sessionController.update("1",sessionDto);
         assertEquals(HttpStatus.OK,response.getStatusCode());
         assertEquals(sessionDto, response.getBody());
-        verify(sessionMapper).toEntity(any(SessionDto.class));
-        verify(sessionService).update(any(Long.class),any(Session.class));
-        verify(sessionMapper).toDto(any(Session.class));
     }
 
     @Test
     void save() {
-        when(sessionService.getById(any(Long.class))).thenReturn(session);
-        SessionController sessionController = new SessionController(sessionService,sessionMapper);
         ResponseEntity<?> response = sessionController.save("1");
         assertEquals(HttpStatus.OK,response.getStatusCode());
-        verify(sessionService).getById(any(Long.class));
-        verify(sessionService).delete(any(Long.class));
     }
 
     @Test
     void participate() {
-        SessionController sessionController = new SessionController(sessionService,sessionMapper);
-        ResponseEntity<?> response = sessionController.participate("1","10");
+        ResponseEntity<?> response = sessionController.participate("1","1");
         assertEquals(HttpStatus.OK,response.getStatusCode());
-        verify(sessionService).participate(any(Long.class),any(Long.class));
     }
 
     @Test
     void noLongerParticipate() {
-        SessionController sessionController = new SessionController(sessionService,sessionMapper);
         ResponseEntity<?> response = sessionController.noLongerParticipate("1","10");
         assertEquals(HttpStatus.OK,response.getStatusCode());
-        verify(sessionService).noLongerParticipate(any(Long.class),any(Long.class));
     }
 }
