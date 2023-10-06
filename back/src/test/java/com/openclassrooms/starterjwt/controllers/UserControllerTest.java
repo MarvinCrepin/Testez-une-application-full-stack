@@ -109,10 +109,6 @@ class UserControllerTest {
                 .password(password)
                 .admin(admin).build();
 
-
-        SecurityContext securityContext = mock(SecurityContext.class);
-        SecurityContextHolder.setContext(securityContext);
-
         ResponseEntity<?> response = userController.save(id.toString());
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
