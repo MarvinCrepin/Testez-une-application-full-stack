@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,11 +26,14 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
 class UserControllerTest {
-    @Mock
+    @Autowired
     private UserMapper userMapper;
-    @Mock
+
+    @Autowired
     private UserService userService;
 
+    @Autowired
+    private UserController userController;
     @Test
     public void findById() {
         Long id = 1L;
@@ -55,10 +59,7 @@ class UserControllerTest {
         dto.setPassword(password);
         dto.setAdmin(admin);
 
-        when(userService.findById(id)).thenReturn(user);
-        when(userMapper.toDto(user)).thenReturn(dto);
 
-        UserController userController = new UserController(userService, userMapper);
         ResponseEntity<?> response = userController.findById(id.toString());
         UserDto responseBody = (UserDto) response.getBody();
 
@@ -70,9 +71,6 @@ class UserControllerTest {
     public void findByIdNotFound() {
         Long id = 1L;
 
-        when(userService.findById(id)).thenReturn(null);
-
-        UserController userController = new UserController(userService, userMapper);
         ResponseEntity<?> response = userController.findById(id.toString());
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
@@ -111,17 +109,10 @@ class UserControllerTest {
                 .password(password)
                 .admin(admin).build();
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null);
-
-        when(userService.findById(id)).thenReturn(user);
 
         SecurityContext securityContext = mock(SecurityContext.class);
         SecurityContextHolder.setContext(securityContext);
 
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        doNothing().when(userService).delete(id);
-
-        UserController userController = new UserController(userService, userMapper);
         ResponseEntity<?> response = userController.save(id.toString());
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -131,9 +122,6 @@ class UserControllerTest {
     public void deleteNotFound() {
         Long id = 1L;
 
-        when(userService.findById(id)).thenReturn(null);
-
-        UserController userController = new UserController(userService, userMapper);
         ResponseEntity<?> response = userController.save(id.toString());
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());

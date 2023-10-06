@@ -14,21 +14,28 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.openclassrooms.starterjwt.dto.TeacherDto;
 import com.openclassrooms.starterjwt.mapper.TeacherMapper;
 import com.openclassrooms.starterjwt.services.TeacherService;
+import org.springframework.test.context.ActiveProfiles;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
+@ActiveProfiles("test")
 class TeacherControllerTest {
 
-    @Mock
+    @Autowired
     private TeacherMapper teacherMapper;
 
-    @Mock
+    @Autowired
     private TeacherService teacherService;
+
+    @Autowired
+    private TeacherController teacherController;
 
     @Test
     public void testTeacherFindByIdOK() {
@@ -40,13 +47,8 @@ class TeacherControllerTest {
         teacherDto.setId(id);
         teacherDto.setLastName(name);
 
-        when(teacherService.findById(id)).thenReturn(teacher);
-        when(teacherMapper.toDto(teacher)).thenReturn(teacherDto);
-        TeacherController teacherController = new TeacherController(teacherService, teacherMapper);
         ResponseEntity<?> response = teacherController.findById(id.toString());
 
-        verify(teacherService).findById(id);
-        verify(teacherMapper).toDto(teacher);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(response.getBody(), teacherDto);
     }
@@ -55,19 +57,14 @@ class TeacherControllerTest {
     public void findTeacherByNotFoundId() {
         Long id = 1L;
 
-        when(teacherService.findById(id)).thenReturn(null);
-        TeacherController teacherController = new TeacherController(teacherService, teacherMapper);
         ResponseEntity<?> response = teacherController.findById(id.toString());
 
-        verify(teacherService).findById(id);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertEquals(response.getBody(), null);
-
     }
 
     @Test
     public void findTeacherWithBadId() {
-        TeacherController teacherController = new TeacherController(teacherService, teacherMapper);
         ResponseEntity<?> response = teacherController.findById("Bad ID");
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -85,9 +82,6 @@ class TeacherControllerTest {
         teacherDtos.add(new TeacherDto());
         teacherDtos.add(new TeacherDto());
 
-        when(teacherService.findAll()).thenReturn(teachers);
-        when(teacherMapper.toDto(teachers)).thenReturn(teacherDtos);
-        TeacherController teacherController = new TeacherController(teacherService, teacherMapper);
         ResponseEntity<?> responseEntity = teacherController.findAll();
 
         assertEquals(200, responseEntity.getStatusCodeValue());

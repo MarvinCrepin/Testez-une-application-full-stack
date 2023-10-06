@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,14 +33,16 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("test")
 class AuthControllerTest {
 
-    @Mock
+    @Autowired
     private AuthenticationManager authenticationManager;
-    @Mock
+    @Autowired
     private JwtUtils jwtUtils;
-    @Mock
+    @Autowired
     private PasswordEncoder passwordEncoder;
-    @Mock
+    @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private AuthController authController;
     private final String email = "john@doe.com";
     private final String password = "johndoe1";
     private final String firstname = "John";
@@ -50,31 +53,6 @@ class AuthControllerTest {
 
         boolean isAdmin = false;
 
-        UserDetailsImpl userDetails = UserDetailsImpl
-                .builder()
-                .username(this.email)
-                .firstName(this.firstname)
-                .lastName(this.lastname)
-                .id(id)
-                .password(this.password)
-                .build();
-
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null);
-
-        when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(this.email, this.password))).thenReturn(authentication);
-        when(jwtUtils.generateJwtToken(authentication)).thenReturn("jwt");
-        when(userRepository.findByEmail(this.email)).thenReturn(
-                Optional.of(User
-                        .builder()
-                        .id(id)
-                        .email(this.email)
-                        .password(this.password)
-                        .firstName(this.firstname)
-                        .lastName(this.lastname)
-                        .admin(isAdmin)
-                        .build()));
-
-        AuthController authController = new AuthController(authenticationManager, passwordEncoder, jwtUtils, userRepository);
         LoginRequest loginRequest = new LoginRequest();
         loginRequest.setEmail(this.email);
         loginRequest.setPassword(this.password);
@@ -93,11 +71,6 @@ class AuthControllerTest {
 
     @Test
     public void RegisterUserOk() {
-        when(userRepository.existsByEmail(email)).thenReturn(false);
-        when(passwordEncoder.encode(password)).thenReturn("hashed");
-        when(userRepository.save(any(User.class))).thenReturn(new User());
-
-        AuthController authController = new AuthController(authenticationManager, passwordEncoder, jwtUtils, userRepository);
         SignupRequest signupRequest = new SignupRequest();
         signupRequest.setEmail(this.email);
         signupRequest.setLastName(this.lastname);
@@ -109,8 +82,6 @@ class AuthControllerTest {
 
     @Test
     public void RegisterUserEmailAlreadyTaken() {
-        when(userRepository.existsByEmail(this.email)).thenReturn(true);
-        AuthController authController = new AuthController(authenticationManager, passwordEncoder, jwtUtils, userRepository);
         SignupRequest signupRequest = new SignupRequest();
         signupRequest.setEmail((this.email));
         signupRequest.setPassword((this.email));
